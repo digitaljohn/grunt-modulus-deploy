@@ -15,17 +15,16 @@ module.exports = function(grunt) {
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
 
-    grunt.registerTask('modulus_deploy', 'Allows deployment to modulus.io from Grunt.', function() {
-        var options = this.options({
-              project: null
-        });
+    grunt.registerMultiTask('modulus-deploy', 'Allows deployment to modulus.io from Grunt.', function() {
+        var options = this.options();
 
         var done = this.async();
 
 
         var args = ["deploy"];
+
         if(options.project){
-            options.push("-p");
+            args.push("-p");
             args.push(options.project);
         }
 
