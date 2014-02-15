@@ -14,15 +14,19 @@ var path = require('path');
 var username = process.env.MODULUS_USER;
 var password = process.env.MODULUS_PWD;
 
-var runCmd = function(cmd, cb) {
-    console.log(cmd);
+var execOptions = {};
+
+var runCmd = function(cmd, okString, cb) {
     var cp = exec(cmd, execOptions, function(err, stdout, stderr) {
         if(err) {
             console.log(err);
             cb(err);
         } else {
-            console.log('Finished.');
-            cb();
+            if(stdout.indexOf(okString) != -1){
+                cb();
+            }else{
+                cb(true);
+            }
         }
     });
 
@@ -35,9 +39,6 @@ var captureOutput = function(child, output) {
 };
 
 module.exports = function(grunt) {
-
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
 
     grunt.registerMultiTask('modulus-deploy', 'Allows deployment to modulus.io from Grunt.', function() {
         var options = this.options();
@@ -54,11 +55,11 @@ module.exports = function(grunt) {
         var deployCmd = modulusPath + ' deploy'
                     + ' -p ' + options.project;
 
-        runCmd(loginCmd, function(err){
+        runCmd(loginCmd, 'Signed in as user', function(err){
             if(err){
                 done(false);
             }else{
-                runCmd(deployCmd, function(err){
+                runCmd(deployCmd, options.project+' running at', function(err){
                     if(err){
                         done(false);
                     }else{
