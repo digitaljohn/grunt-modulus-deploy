@@ -8,7 +8,31 @@
 
 'use strict';
 
-var childProcess = require('child_process');
+var exec = require('child_process').exec;
+var path = require('path');
+
+var username = process.env.MODULUS_USER;
+var password = process.env.MODULUS_PWD;
+
+var runCmd = function(cmd, cb) {
+    console.log(cmd);
+    var cp = exec(cmd, execOptions, function(err, stdout, stderr) {
+        if(err) {
+            console.log(err);
+            cb(err);
+        } else {
+            console.log('Finished.');
+            cb();
+        }
+    });
+
+    captureOutput(cp.stdout, process.stdout);
+    captureOutput(cp.stderr, process.stderr);
+};
+
+var captureOutput = function(child, output) {
+    child.pipe(output);
+};
 
 module.exports = function(grunt) {
 
@@ -21,26 +45,29 @@ module.exports = function(grunt) {
         var done = this.async();
 
 
-        var args = ["deploy"];
+        var modulusPath = path.relative(process.cwd(), path.join(__dirname, '../', 'node_modules', 'modulus', 'bin', 'modulus'));
 
-        if(options.project){
-            args.push("-p");
-            args.push(options.project);
-        }
+        var loginCmd = modulusPath + ' login'
+                    + ' --username ' + username
+                    + ' --password ' + password;
 
+        var deployCmd = modulusPath + ' deploy'
+                    + ' -p ' + options.project;
 
-        var child = childProcess.spawn("modulus", args);
-
-        child.stdout.pipe( process.stdout );
-
-        child.stderr.on("data", function (data) {
-            console.log(data.toString());
+        runCmd(loginCmd, function(err){
+            if(err){
+                done(false);
+            }else{
+                runCmd(deployCmd, function(err){
+                    if(err){
+                        done(false);
+                    }else{
+                        done(true);
+                    }
+                });
+            }
         });
 
-        child.on("exit", function (code) {
-            done( code === 0 );
-        });
-
-  });
+    });
 
 };
