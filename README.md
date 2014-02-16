@@ -21,11 +21,8 @@ grunt.loadNpmTasks('grunt-modulus-deploy');
 
 This plugin requires you add environment variables to authenticate with modulus.
 
-###MODULUS_USER
- - The username you use when logging into modulus. If you use a github login, then this is your github username
-
-###MODULUS_PWD
- - The password you use when logging into modulus. If you use a github login, then this is your github password
+###MODULUS_TOKEN
+ - The API Token that gives access to deploy to the specified project. Please see here for documentation on [how to create an API Token](https://modulus.io/codex/cli/using_api_tokens).
 
 ## The "modulus-deploy" task
 
