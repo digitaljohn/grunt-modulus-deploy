@@ -11,6 +11,9 @@
 var exec = require('child_process').exec;
 var path = require('path');
 
+var isWin = /^win/.test(process.platform);
+var modulusPath = isWin ? 'modulus' : path.relative(process.cwd(), path.join(__dirname, '../', 'node_modules', 'modulus', 'bin', 'modulus'));
+
 var execOptions = {};
 
 var runCmd = function(cmd, okString, cb) {
@@ -42,10 +45,7 @@ module.exports = function(grunt) {
 
         var done = this.async();
 
-        var modulusPath = path.relative(process.cwd(), path.join(__dirname, '../', 'node_modules', 'modulus', 'bin', 'modulus'));
-
-        var deployCmd = modulusPath + ' deploy'
-                    + ' -p ' + options.project;
+        var deployCmd = modulusPath + ' deploy' + ' -p ' + options.project;
 
         runCmd(deployCmd, options.project+' running at', function(err){
             if(err){
